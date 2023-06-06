@@ -58,3 +58,20 @@ COPY pom.xml pom.xml
 COPY src src
 
 RUN mvn verify
+
+FROM scratch as final
+
+ENV PATH=/usr/lib/jvm/jdk-17.0.6-bellsoft-x86_64/bin:/opt/bin/tomcat/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US.UTF-8:en
+ENV JAVA_HOME=/usr/lib/jvm/jdk-17.0.6-bellsoft-x86_64
+ENV CATALINA_HOME=/opt/bin/tomcat
+
+COPY --from=verfy /usr/app/rootfs /
+COPY --from=verfy /usr/app/tomcat /opt/bin/tomcat
+RUN rm $CATALINA_HOME/webapps/* -rf
+COPY --from=buld /usr/app/target/api.war $CATALINA_HOME/webapps/ROOT.war
+
+EXPOSE 8080
+
+CMD [ "catalina.sh", "run" ]
