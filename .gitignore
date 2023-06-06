@@ -1,5 +1,4 @@
 base
-Dockerfile
 dev-*.yml
 HELP.md
 target/
