@@ -15,4 +15,17 @@ RUN apk add --no-cache curl gnupg
 RUN curl -sLJO ${GPG_KEY_URL} \
     && if [ $(gpg --with-colons --import-options show-only --import key.gpg | awk -F: '$1 == "fpr" {print $10;}') != ${FPR} ]; then exit 1; fi
 
-RUN curl -sLJO --compressed ${ROOTFS_URL}
+RUN curl -sLJO --compressed ${ROOTFS_URL} \
+    && curl -sLJO --compressed ${ROOTFS_URL}.sha512 \
+    && curl -sLJO --compressed ${ROOTFS_URL}.sha512.asc \
+    && sha512sum -c rootfs.tar.gz.sha512
+
+RUN curl -sLJO --compressed ${MAVEN_URL} \
+    && curl -sLJO --compressed ${MAVEN_URL}.sha512 \
+    && curl -sLJO --compressed ${MAVEN_URL}.sha512.asc \
+    && sha512sum -c apache-maven-3.9.1-bin.tar.gz.sha512
+
+RUN curl -sLJO --compressed ${TOMCAT_URL} \
+    && curl -sLJO --compressed ${TOMCAT_URL}.sha512 \
+    && curl -sLJO --compressed ${TOMCAT_URL}.sha512.asc \
+    && sha512sum -c apache-tomcat-10.1.7.tar.gz.sha512
