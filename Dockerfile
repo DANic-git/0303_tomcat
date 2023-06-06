@@ -10,7 +10,7 @@ ENV HOME=/usr/app
 RUN mkdir -p $HOME
 WORKDIR $HOME
 
-RUN apk add --no-cache curl gnupg
+RUN apk add --no-cache curl gnupg tar
 
 RUN curl -sLJO ${GPG_KEY_URL} \
     && if [ $(gpg --with-colons --import-options show-only --import key.gpg | awk -F: '$1 == "fpr" {print $10;}') != ${FPR} ]; then exit 1; fi
@@ -29,3 +29,8 @@ RUN curl -sLJO --compressed ${TOMCAT_URL} \
     && curl -sLJO --compressed ${TOMCAT_URL}.sha512 \
     && curl -sLJO --compressed ${TOMCAT_URL}.sha512.asc \
     && sha512sum -c apache-tomcat-10.1.7.tar.gz.sha512
+
+RUN gpg --import key.gpg
+RUN gpg --batch --verify rootfs.tar.gz.sha512.asc rootfs.tar.gz.sha512
+RUN gpg --batch --verify apache-maven-3.9.1-bin.tar.gz.sha512.asc apache-maven-3.9.1-bin.tar.gz.sha512
+RUN gpg --batch --verify apache-tomcat-10.1.7.tar.gz.sha512.asc apache-tomcat-10.1.7.tar.gz.sha512
